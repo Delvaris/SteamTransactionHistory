@@ -5,6 +5,9 @@ It will eventually find a saved steam transaction history in the same directory,
 
 BeautifulSoup4 -> Pandas parsing code credit to Alexander Lacson, @max-torch on github. Rewritten not pulled.
 
+Note: ALL successful executions will end with "Press a key to exit" if literally anything else has happened the the program threw an exception and it was caught. If the output is incorrect
+then the bug is logical and you should open an issue.
+
 FAQ:
 
 Will I compile executables or create releases for other platforms?
