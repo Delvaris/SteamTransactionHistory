@@ -1,7 +1,7 @@
-import pandas as pd #daatframes are useful
+import pandas as pd #datatframes are useful
 from bs4 import BeautifulSoup #we only need to parse the raw HTML no need to import all of BS4
 import os #for paths
-import re #it's re....
+#import re #it's re....
 import sys #it's sys....
 
 def findandSoup():
@@ -20,7 +20,7 @@ def findandSoup():
     
         
 
-def dataScrubber(transHist):
+def comprehendData(transHist):
     '''Creates lists of relevent columns, excludes all entries before 1/28/2017, as well as
     removes transactions that are not games, before creating the dictionary which will create
     the dataframe. Credit to Alexander Lacson's post on Medium from May 21, 2021 for the code that
@@ -38,9 +38,30 @@ def dataScrubber(transHist):
 
     #Items (game name)
     wht_items = transHist.select(".wht_items")
-    wht_items = [each.get_text().replace("\n", "_").replace("\t", '') for each in wht_items[1:]]
+    wht_items = [each.get_text().replace("\\n", "_").replace("\\t", '') for each in wht_items[1:]]
 
-    print(wht_items)
+    #transaction types
+    wht_type = transHist.select(".wht_type")
+    wht_type = [each.get_text().replace("\\n", "_").replace("\\t", '') for each in wht_type[1:]]
+
+    #Individual transaction totals, this is the major rewrite to the previous found work, I could not make the list comprehension work as hard as I tried.
+    wht_total_num = []
+    wht_total = transHist.select(".wht_total")
+    wht_total = [each.get_text().strip().replace("\\n", "").replace(',', '').replace("\\t", '').replace('$', '') for each in wht_total[1:]]
+    for index, each in enumerate(wht_total):
+        each = each.replace('$', '').replace("\\t", '').replace('\n', '_')
+        newEach = ''
+        for char in each:
+            if char.isnumeric() or char == '.':
+                 newEach += char
+            wht_total_num.append(float(newEach))
+        else:
+            wht_total_num.append(0.0)
+
+
+
+    print(wht_total_num)
+    print(sum(wht_total_num))
 
     return frameDict
 
@@ -63,13 +84,13 @@ def main ():
         else:
             raise ValueError
     except ValueError:
-        sys.exit('')
+        sys.exit('Houston, we have a problem, the soup was not made. This is most commonly due to the transaction history HTML file not existing in the same directory as the executable, ensure this and try again')
         
     
-    transDict = dataScrubber(rawHTML)
-    ending = input("\n Press any key to exit")
+    transDict = comprehendData(rawHTML)
     #createDF(transDict)
     #outputTotal(transactions)
+    ending = input("\n Press any key to exit")
 
 
 if __name__ == '__main__':
