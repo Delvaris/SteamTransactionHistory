@@ -15,13 +15,10 @@ def findandSoup():
         sys.exit('you know you shouldn\'t have more than one htm or html file here. stop trying to make me look bad.')
     file = files[0]
     transHistSoup = BeautifulSoup(open(file, encoding= "utf8"), "html.parser")
-    try:
-        if 'document' in transHistSoup.name:
-            return transHistSoup
-        else:
-            raise ValueError
-    except ValueError:
-        sys.exit('Houston, we have a problem, the Soup was not made.\nChances are the .htm / .html file you saved from your steam transaction history is not in the same directory as this app')
+    
+    return transHistSoup
+    
+        
 
 def dataScrubber(transHist):
     '''Creates lists of relevent columns, excludes all entries before 1/28/2017, as well as
@@ -47,13 +44,6 @@ def dataScrubber(transHist):
 
     return frameDict
 
-
-
-
-
-
-    
-
 def createDF(transDict):
     '''Literally just declares a global variable to store the dataframe and creates it from the
     passed dictionary
@@ -65,13 +55,19 @@ def outputTotal():
     pass
 
 def main ():
-
-    rawHTML = findandSoup()
-    if 'document' in rawHTML.name:
-        print('Soups Done, Time to Strain')
+    
+    try:
+        rawHTML = findandSoup()
+        if 'document' in rawHTML.name:
+            print('Soups Done, Time to Strain')
+        else:
+            raise ValueError
+    except ValueError:
+        sys.exit('')
         
     
     transDict = dataScrubber(rawHTML)
+    ending = input("\n Press any key to exit")
     #createDF(transDict)
     #outputTotal(transactions)
 
