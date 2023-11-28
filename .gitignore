@@ -7712,3 +7712,4 @@ dist/steamTransactionHistory/steamTransactionHistory/_internal/zmq/backend/cytho
 dist/steamTransactionHistory/steamTransactionHistory/_internal/zmq/backend/cython/message.cp311-win_amd64.pyd
 dist/steamTransactionHistory/steamTransactionHistory/_internal/zmq/backend/cython/socket.cp311-win_amd64.pyd
 dist/steamTransactionHistory/steamTransactionHistory/_internal/zmq/backend/cython/utils.cp311-win_amd64.pyd
+dist/steamTransactionHistory/steamTransactionHistory.zip
