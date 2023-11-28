@@ -3,7 +3,7 @@
 The release is a zip file containing a win64 executable and required dependencies to execute it in an environment that does not have the Python interpreter installed.
 It will eventually find a saved steam transaction history in the same directory, parse it, and provide the total transaction amount from January 28, 2017 to present.
 
-BeautifulSoup4 -> Pandas parsing code credit to Alexander Lacson, @max-torch. Rewritten not pulled.
+BeautifulSoup4 -> Pandas parsing code credit to Alexander Lacson, @max-torch on github. Rewritten not pulled.
 
 FAQ:
 
