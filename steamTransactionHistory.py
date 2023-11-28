@@ -64,8 +64,8 @@ def createDF(transDict):
 def outputTotal():
     pass
 
-if __name__ == '__main__':
-    
+def main ():
+
     rawHTML = findandSoup()
     if 'document' in rawHTML.name:
         print('Soups Done, Time to Strain')
@@ -74,6 +74,11 @@ if __name__ == '__main__':
     transDict = dataScrubber(rawHTML)
     #createDF(transDict)
     #outputTotal(transactions)
+
+
+if __name__ == '__main__':
+    
+    main()
 
 
     
