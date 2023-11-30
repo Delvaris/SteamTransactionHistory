@@ -7714,3 +7714,4 @@ dist/steamTransactionHistory/steamTransactionHistory/_internal/zmq/backend/cytho
 dist/steamTransactionHistory/steamTransactionHistory/_internal/zmq/backend/cython/utils.cp311-win_amd64.pyd
 dist/steamTransactionHistory/steamTransactionHistory.zip
 transactions.xls
+transactions.xlsx
