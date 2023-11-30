@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup #we only need to parse the raw HTML no need to imp
 import os #for paths
 import re #it's re....
 import sys #it's sys....
+import traceback #for printing unexpected execeptions.
 
 def findandSoup():
     '''This finds what should be the only HTML file in the current working directory. 
@@ -99,14 +100,33 @@ def main ():
         if 'document' in rawHTML.name:
             print('Soups Done, Time to Strain')
         else:
-            raise ValueError
-    except ValueError:
-        sys.exit('Houston, we have a problem, the soup was not made. This is most commonly due to the transaction history HTML file not existing in the same directory as the executable, ensure this and try again')
+            raise TypeError
+    except Exception as e:
+        if type(e) == "TypeError":
+            sys.exit('Houston, we have a problem, the soup was not made. This is most commonly due to the transaction history HTML file not existing in the same directory as the executable, ensure this and try again')
+        else:
+            traceback.print_exc()
+            sys.exit("Post a screenshot of this to @Delvaris on Github, however how you managed this one it's amazing because I specifically raised a certain exception that it should have thrown instead. Enka.")
+
         
+    try:
+        transDict = comprehendData(rawHTML)
+    except Exception:
+        traceback.print_exc()
+        sys.exit("Post a screenshot of this to @Devlaris on Github.")
     
-    transDict = comprehendData(rawHTML)
-    createDF(transDict)
-    outputTotal()
+    try:
+        createDF(transDict)
+    except Exception:
+        traceback.print_exc()
+        sys.exit("Post a screenshot of this to @Delvaris on Github")
+    
+    try:
+        outputTotal()
+    except Exception:
+        traceback.print_exc()
+        sys.exit("Post a screenshot of this to @Devlaris on Github")
+    
     ending = input("\n Press any key to exit")
 
 
