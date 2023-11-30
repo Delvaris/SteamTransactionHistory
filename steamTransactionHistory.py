@@ -24,14 +24,21 @@ def findandSoup():
 def comprehendData(transHist):
     '''Creates lists of relevent columns, excludes all entries before 1/28/2017, as well as
     removes transactions that are not games, before creating the dictionary which will create
-    the dataframe. Credit to Alexander Lacson's post on Medium from May 21, 2021 for the code that
-    creates the precursor lists and does some cleaning.
+    the dataframe. Credit to Alexander Lacson's, aka @Max_Turbo on Github, post on Medium from May 21, 2021 for the code that
+    creates the precursor lists and does some cleaning. rewritten not pulled, Total section is a complete rewrite as his list comprehension did not work anymore.
     '''
     frameDict = {}
 
-    exclusions = ['in-game purchase', 'wallet credit', "steam promotion"]
-    #The elimination of non-qualifying purchases could probably be determined via a comparison of type with "Purchase" as an allowed member, however this is more modular.
-    #All are lowercase, because I am going to casefold for comparison.
+    #exclusions = ['in-game purchase', 'wallet credit', "steam promotion"]
+    '''The elimination of non-qualifying purchases could probably be determined via a comparison of type with "Purchase" as an allowed member, however this is more modular.
+        All are lowercase, because I am going to casefold for comparison.
+
+        Note as of Nov 30, 2023 at 0700, release v3.0.1-alpha-:
+
+        Currently considering final clean up with select statements instead of using further work on the lists. This parsing takes care of everything with Total so it can be converted to a float and a usable column. 
+        It is TBD if I will apply similiar methods to completely clean the other columns. One advantage to not doing it is as it stands right now it works, all dates have a matching item, have a matching type, have a 
+        matching total. The sheer amount of cleanup I had to do to the totals resulted in at least 2 entries on my personal transactions list that ended up completely nulled out. Given this it seems like working with 
+        the set as a dataframe is the way forward.''' 
 
     #Date
     wht_date = transHist.select(".wht_date")
@@ -48,17 +55,8 @@ def comprehendData(transHist):
     #Individual transaction totals, this is the major rewrite to the previous found work, I could not make the list comprehension work as hard as I tried.
     wht_total_num = []
     wht_total = transHist.select(".wht_total")
-    '''wht_total = [each.get_text().strip().replace("\\n", "").replace(',', '').replace("\\t", '').replace('$', '') for each in wht_total[1:]]
-    for index, each in enumerate(wht_total):
-        each = each.replace('$', '').replace("\\t", '').replace('\n', '_')
-        newEach = ''
-        for char in each:
-            if char.isnumeric() or char == '.':
-                 newEach += char
-            wht_total_num.append(float(newEach))
-        else:
-            wht_total_num.append(0.0)'''
     wht_total=[each.get_text().strip().replace(',', '') for each in wht_total[1:]]
+
     for index, each in enumerate(wht_total[0:]):
         cleaned_string = each.replace('\t', '').replace('\n', '').replace('Credit', '').replace('$', '').strip()
         if cleaned_string == '':
@@ -66,11 +64,14 @@ def comprehendData(transHist):
         else:        
             wht_total[index] = cleaned_string
 
+    #the above is sometimes too agressive and leave totals as null strings, hence the if-else statement above. This loop is to just to ensure all values convert to floats and it spits out an error specifiying index and value if not.
+    #Note I am comfortable with setting them to 0.0 because I checked the parsed HTML and they were simply strings of \t \n and whitespace. Assigning them 0.0 does not effect the total in any way. I do not expect it to trigger.
     for index, each in enumerate(wht_total[0:]):
             try:
                 wht_total[index] = float(each)
             except:
                 print(f"There Was a value error at {index} and {each} ")
+                sys.exit("Send a screenshot of this to @Delvaris on Github")
     
     #print(sum(wht_total), len(wht_total))
 
@@ -80,7 +81,8 @@ def comprehendData(transHist):
 
 def createDF(transDict):
     '''Literally just declares a global variable to store the dataframe and creates it from the
-    passed dictionary
+    passed dictionary. Converts the Date column to Datetime, and outputs an xlsx file of the full
+    dataframe from account creation to present.
     '''
     global transactions 
     transactions = pd.DataFrame.from_dict(transDict)
@@ -111,11 +113,13 @@ def main ():
         
     try:
         transDict = comprehendData(rawHTML)
+        print('Big chunks are out, let\'s comphrehend most of this')
     except Exception:
         traceback.print_exc()
         sys.exit("Post a screenshot of this to @Devlaris on Github.")
     
     try:
+        print('Comprehension done, time to build a dataframe')
         createDF(transDict)
     except Exception:
         traceback.print_exc()
