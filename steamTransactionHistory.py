@@ -85,7 +85,7 @@ def createDF(transDict):
     transactions.Date = pd.to_datetime(transactions.Date, infer_datetime_format=True)
 
     print(transactions.head)
-    transactions.to_excel('.\\transactions.xls')
+    transactions.to_excel('.\\transactions.xlsx')
 
 def outputTotal():
     pass
