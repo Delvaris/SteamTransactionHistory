@@ -88,7 +88,7 @@ def createDF(transDict):
     transactions.to_excel('.\\transactions.xlsx')
 
 def outputTotal():
-    pass
+    print(transactions["Total"].cumsum())
 
 def main ():
     
@@ -104,7 +104,7 @@ def main ():
     
     transDict = comprehendData(rawHTML)
     createDF(transDict)
-    #outputTotal(transactions)
+    outputTotal()
     ending = input("\n Press any key to exit")
 
 
