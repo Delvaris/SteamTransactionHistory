@@ -60,9 +60,11 @@ def comprehendData(transHist):
     wht_total=[each.get_text().strip().replace(',', '') for each in wht_total[1:]]
     for index, each in enumerate(wht_total[0:]):
         cleaned_string = each.replace('\t', '').replace('\n', '').replace('Credit', '').replace('$', '').strip()
-        wht_total[index] = cleaned_string
-    wht_total[91] = '0.0'
-    wht_total[341] = '0.0'
+        if cleaned_string == '':
+            wht_total[index] = 0.0
+        else:        
+            wht_total[index] = cleaned_string
+
     for index, each in enumerate(wht_total[0:]):
             try:
                 wht_total[index] = float(each)
