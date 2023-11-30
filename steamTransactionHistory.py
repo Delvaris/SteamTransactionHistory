@@ -1,7 +1,7 @@
 import pandas as pd #datatframes are useful
 from bs4 import BeautifulSoup #we only need to parse the raw HTML no need to import all of BS4
 import os #for paths
-#import re #it's re....
+import re #it's re....
 import sys #it's sys....
 
 def findandSoup():
@@ -47,7 +47,7 @@ def comprehendData(transHist):
     #Individual transaction totals, this is the major rewrite to the previous found work, I could not make the list comprehension work as hard as I tried.
     wht_total_num = []
     wht_total = transHist.select(".wht_total")
-    wht_total = [each.get_text().strip().replace("\\n", "").replace(',', '').replace("\\t", '').replace('$', '') for each in wht_total[1:]]
+    '''wht_total = [each.get_text().strip().replace("\\n", "").replace(',', '').replace("\\t", '').replace('$', '') for each in wht_total[1:]]
     for index, each in enumerate(wht_total):
         each = each.replace('$', '').replace("\\t", '').replace('\n', '_')
         newEach = ''
@@ -56,12 +56,22 @@ def comprehendData(transHist):
                  newEach += char
             wht_total_num.append(float(newEach))
         else:
-            wht_total_num.append(0.0)
+            wht_total_num.append(0.0)'''
+    wht_total=[each.get_text().strip().replace(',', '') for each in wht_total[1:]]
+    for index, each in enumerate(wht_total[0:]):
+        cleaned_string = each.replace('\t', '').replace('\n', '').replace('Credit', '').replace('$', '').strip()
+        wht_total[index] = cleaned_string
+    wht_total[91] = '0.0'
+    wht_total[341] = '0.0'
+    for index, each in enumerate(wht_total[0:]):
+            try:
+                wht_total[index] = float(each)
+            except:
+                print(f"There Was a value error at {index} and {each} ")
+    
+    #print(sum(wht_total), len(wht_total))
 
-
-
-    print(wht_total_num)
-    print(sum(wht_total_num))
+    frameDict = {'Date' : wht_date, "Items" : wht_items, 'Type' : wht_type, 'Total' : wht_total}
 
     return frameDict
 
@@ -71,6 +81,11 @@ def createDF(transDict):
     '''
     global transactions 
     transactions = pd.DataFrame.from_dict(transDict)
+
+    transactions.Date = pd.to_datetime(transactions.Date, infer_datetime_format=True)
+
+    print(transactions.head)
+    transactions.to_excel('.\\transactions.xls')
 
 def outputTotal():
     pass
@@ -88,7 +103,7 @@ def main ():
         
     
     transDict = comprehendData(rawHTML)
-    #createDF(transDict)
+    createDF(transDict)
     #outputTotal(transactions)
     ending = input("\n Press any key to exit")
 
