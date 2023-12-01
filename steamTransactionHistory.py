@@ -106,7 +106,7 @@ def outputTotal():
     transactions.loc[transactions['Type'].str.contains('refund', flags=re.IGNORECASE, regex=True), 'Total'] = transactions['Total'] * -1
     # filter transactions to exclude purchases of wallet credit
     transactions = transactions.loc[~transactions['Items'].str.contains('wallet credit', flags=re.IGNORECASE, regex=True)]
-    print(transactions["Total"].cumsum())
+    print(f'The total spent on JUST games and DLC since January 28, 2017 is {transactions["Total"].sum()}')
     #add a row to the end of the dataframe with today's date, the Item column as TOTAL, the Type column as TOTAL, and the Total column as the sum of the Total column
     transactions = pd.concat([transactions, pd.Series(['TOTAL', 'TOTAL', 'TOTAL', transactions['Total'].sum()], index=transactions.columns)], ignore_index=True)
     #reindex the frame
