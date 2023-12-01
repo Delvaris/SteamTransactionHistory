@@ -46,13 +46,13 @@ def comprehendData(transHist):
 
     #Items (game name)
     wht_items = transHist.select(".wht_items")
-    wht_items = [each.get_text().replace("\\n", "_").replace("\\t", '') for each in wht_items[1:]]
+    wht_items = [each.get_text().replace("\n", "_").replace("\t", '') for each in wht_items[1:]]
 
     #transaction types
     wht_type = transHist.select(".wht_type")
-    wht_type = [each.get_text().replace("\\n", "_").replace("\\t", '') for each in wht_type[1:]]
+    wht_type = [each.get_text().replace("\n", "_").replace("\t", '') for each in wht_type[1:]]
 
-    #Individual transaction totals, this is the major rewrite to the previous found work, I could not make the list comprehension work as hard as I tried.
+    #Individual transaction totals, this is the major rewrite to the previous found work, I could not make a single list comprehension work as hard as I tried, so I broke it into 3 steps.
     wht_total_num = []
     wht_total = transHist.select(".wht_total")
     wht_total=[each.get_text().strip().replace(',', '') for each in wht_total[1:]]
@@ -84,16 +84,37 @@ def createDF(transDict):
     passed dictionary. Converts the Date column to Datetime, and outputs an xlsx file of the full
     dataframe from account creation to present.
     '''
-    global transactions 
+    global transactions
     transactions = pd.DataFrame.from_dict(transDict)
 
     transactions.Date = pd.to_datetime(transactions.Date, infer_datetime_format=True)
-
-    print(transactions.head)
     transactions.to_excel('.\\transactions.xlsx')
 
 def outputTotal():
+
+    '''This function is a complete rewrite of the original outputTotal function. It is designed to take the dataframe created by createDF and filter it to only include purchases made on or after 
+    January 28th, 2017, and to remove in-game purchases, and purchases of wallet credit. It then outputs the dataframe to an xlsx file, and writes the cumulative sum of the Total column to the console.
+    Selection Statements made with co-pilot, and double checked by me.
+    '''
+    
+    global transactions
+    # Filter transactions to only include those made on or after January 28th, 2017
+    transactions = transactions.loc[transactions['Date'] >= '2017-01-28']
+    # filter transactions to remove in-game purchases, and purchases of wallet credit
+    transactions = transactions.loc[~transactions['Type'].str.contains('in-game purchase|wallet credit|steam promotion', flags=re.IGNORECASE, regex=True)]
+    #If the type column includes the phrase Refund make that row's total negative
+    transactions.loc[transactions['Type'].str.contains('refund', flags=re.IGNORECASE, regex=True), 'Total'] = transactions['Total'] * -1
+    # filter transactions to exclude purchases of wallet credit
+    transactions = transactions.loc[~transactions['Items'].str.contains('wallet credit', flags=re.IGNORECASE, regex=True)]
     print(transactions["Total"].cumsum())
+    #add a row to the end of the dataframe with today's date, the Item column as TOTAL, the Type column as TOTAL, and the Total column as the sum of the Total column
+    transactions = pd.concat([transactions, pd.Series(['TOTAL', 'TOTAL', 'TOTAL', transactions['Total'].sum()], index=transactions.columns)], ignore_index=True)
+    #reindex the frame
+    transactions.reset_index(drop=True, inplace=True)
+    #output the dataframe to an xlsx file called filtered_transactions.xlsx
+    transactions.to_excel('.\\filtered_transactions.xlsx')
+
+    
 
 def main ():
     
